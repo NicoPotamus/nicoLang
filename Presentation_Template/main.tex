@@ -1,42 +1,10 @@
-\documentclass{beamer} 
+\documentclass{beamer}
 \usepackage[utf8]{inputenc}
-\usepackage{colortbl}
 \usepackage{tikz}
-\usepackage{lmodern}
-\usepackage{amsthm}
 \usepackage{amsmath}
-\usepackage[ruled,vlined]{algorithm2e}
-\usepackage[noend]{algorithmic}
-\usepackage{centernot} 
-\usepackage{caption}
-\algsetup{indent=2em} 
-\renewcommand{\algorithmiccomment}[1]{\hspace{2em}// #1} 
-\usepackage{listings}
-\usepackage{epsfig, amssymb, geometry}
-\usepackage{latexsym, graphics, graphicx}
-\usepackage{amsxtra,mathtools}
-\usepackage{textcomp}
-\usepackage{mathptmx,mathrsfs, trajan}
-\usepackage{float}
-\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{graphicx}
 \usetikzlibrary{automata, positioning,arrows.meta,quotes}
-\usepackage{comment}
-\usepackage{lineno}
-\usepackage{semantic}
-\usepackage{enumitem}
-\usepackage{mathtools}
-\usepackage{ifthen}
-\usepackage{xcolor}
-\usepackage{proof}
-\usepackage{changepage}
-\usepackage{extarrows}
-\usepackage{fancyvrb}
-\usepackage{textpos}
-\usepackage[font=small,labelfont=bf]{caption}
-\usepackage{multicol}
-\usepackage{qtree}
-\usetikzlibrary{circuits.logic.US}
-\usepackage{chronology}
 \usetheme{Madrid}
 \useoutertheme{infolines} 
 \useinnertheme{circles}
@@ -73,13 +41,13 @@
 \subtitle{Understanding SCCs in Call Graph Analysis\newline \today}
 
 
-\definecolor{bottomLeft}{RGB}{108, 166, 205}%color for bottom left footer, and Block top labels
+\definecolor{bottomLeft}{RGB}{255, 200, 87}%color for bottom left footer, and Block top labels (SpongeBob yellow)
 
-\definecolor{headers}{RGB}{0, 191, 255}%color for headers on slides, and table of contents, itemize etc.
+\definecolor{headers}{RGB}{0, 150, 200}%color for headers on slides, and table of contents, itemize etc. (Ocean blue)
 
 \definecolor{writing}{RGB}{255,255,255}%color for writing in headers section
 
-\definecolor{mynavy}{RGB}{36,52,102}%color for text on slides
+\definecolor{mynavy}{RGB}{20, 60, 100}%color for text on slides (Deep ocean blue)
 
 \setbeamercolor{palette primary}{bg=headers,fg=writing}
 %bg is for headers, fg is for text
@@ -119,91 +87,272 @@
 \frame{\titlepage}
 }
 
-%first section
-\section{First Section}
-%creates a frame
-\begin{frame}{Frame Title}%Frame Title
-This is a sample frame.
+%Introduction
+\section{Introduction}
 
-   %creates a list of things
-   \begin{itemize}
-       \item Item 1
-       \item[-] Item 2 %you can choose the bullet point you want
-   \end{itemize}
-
-   \bigskip
-   
-%creates a list with larger gaps
+\begin{frame}{Overview}
+This presentation covers:
 \begin{myitemize}
-    \item[$\bullet$] Item A
-    \item[+] Item B
+    \item Fundamentals of Compiler Construction
+    \item Graph Theory in Compilers
+    \item Real-World Application: Call Graph Analysis
+    \item LLVM Integration
 \end{myitemize}
 \end{frame}
-\begin{frame}{Frame Title}
-%this is how you can add a definition
-    \begin{definition}
-        A \underline{\textbf{\emph{new word}}} is ...
-       
-    \end{definition}
-    \pause% this is how you can create a slide that appears step-by-step
 
-    %this is an example block
-    \begin{block}{Block Title}
-        Here is a really cool example. 
+%Compiler Construction Basics
+\section{Compiler Construction Basics}
+
+\begin{frame}{What is a Compiler?}
+    \begin{definition}
+        A \underline{\textbf{\emph{compiler}}} is a program that translates source code from a high-level programming language into machine code or intermediate representation.
+    \end{definition}
+    \pause
+
+    \begin{block}{Key Responsibilities}
+        \begin{itemize}
+            \item Translate human-readable code to executable format
+            \item Check for syntax and semantic errors
+            \item Optimize code for performance
+            \item Generate warnings and error messages
+        \end{itemize}
     \end{block}
-\pause
-\begin{block}{Block Title}
-   Here is the answer to that really cool example
+\end{frame}
+
+\begin{frame}{Compiler Phases}
+The compilation process consists of several phases:
+\begin{myenumerate}
+    \item \textbf{Lexical Analysis} - Breaking source into tokens
+    \item \textbf{Syntax Analysis} - Building parse trees
+    \item \textbf{Semantic Analysis} - Type checking, scope resolution
+    \item \textbf{Intermediate Code Generation}
+    \item \textbf{Optimization}
+    \item \textbf{Code Generation}
+\end{myenumerate}
+\end{frame}
+
+\begin{frame}{Frontend vs Backend}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Frontend}
+    \begin{itemize}
+        \item Lexical Analysis
+        \item Parsing
+        \item Semantic Analysis
+        \item Symbol Tables
+        \item Type Checking
+    \end{itemize}
 \end{block}
 
+\column{0.5\textwidth}
+\begin{block}{Backend}
+    \begin{itemize}
+        \item Code Optimization
+        \item Register Allocation
+        \item Code Generation
+        \item Target-specific transforms
+    \end{itemize}
+\end{block}
+\end{columns}
 \end{frame}
 
-\subsection{New SubSection}
+\subsection{Semantic Analysis}
 
-\begin{frame}{Frame with photo}
-\begin{figure}
-    \centering
-       \includegraphics[scale=0.2]{regLang.jpg}
+\begin{frame}{Semantic Analysis Phase}
+\begin{myitemize}
+    \item \textbf{Type Checking}: Verify type compatibility
+    \item \textbf{Scope Resolution}: Variable and function visibility
+    \item \textbf{Flow Analysis}: Control and data flow
+    \item \textbf{Call Graph Construction}: Function dependencies
+\end{myitemize}
 
-\end{figure}
+\bigskip
+\pause
+
+\begin{alertblock}{Why Call Graphs Matter}
+Call graphs help detect:
+\begin{itemize}
+    \item Recursive functions (direct and indirect)
+    \item Unreachable code
+    \item Optimization opportunities
+    \item Stack overflow risks
+\end{itemize}
+\end{alertblock}
 \end{frame}
 
-\section{New Section}
+%Graph Theory in Compilers
+\section{Graph Theory in Compilers}
 
-\begin{frame}{Frame with multiple photos}
-\centering
-%only is how we can choose which slides something appears on.
-%this picture will appear on slide 1
-\only<1>{
-    \includegraphics[]{motivation.png}}
-    %this picture will appear on slide 2
-    \only<2>{\includegraphics[scale=0.8]{motivation2.png}}
-%this text will appear on slide 1,2,3
-\only<1,2,3>{HELLO}
-%this text will appear on slide 3
-\only<3>{GOODBYE}
-   
+\begin{frame}{Call Graphs}
+    \begin{definition}
+        A \underline{\textbf{\emph{call graph}}} is a directed graph where nodes represent functions and edges represent function calls.
+    \end{definition}
+    \pause
+
+    \begin{block}{Example}
+        If function \texttt{f()} calls \texttt{g()}, we draw an edge: \texttt{f} $\rightarrow$ \texttt{g}
+    \end{block}
+    \pause
+
+    \begin{block}{Purpose}
+        \begin{itemize}
+            \item Analyze program structure
+            \item Detect recursion (cycles in the graph)
+            \item Optimize function inlining
+            \item Determine call order
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+%Implementation in nicoLang
+\section{Implementation in nicoLang}
+
+\begin{frame}{nicoLang Compiler}
+\begin{block}{Project Overview}
+nicoLang is a compiler project that implements call graph analysis using Tarjan's algorithm to detect recursive functions.
+\end{block}
+
+\bigskip
+
+\begin{myitemize}
+    \item Written in C++
+    \item Header-only implementation
+    \item Detects both direct and mutual recursion
+    \item Provides detailed SCC reporting
+\end{myitemize}
+\end{frame}
+
+\begin{frame}{Usage in Compilation}
+\begin{myenumerate}
+    \item During semantic analysis, record function calls
+    \item Build the call graph incrementally
+    \item After parsing, run \texttt{analyze()}
+    \item Tarjan's algorithm detects all SCCs
+    \item Compiler can then:
+    \begin{itemize}
+        \item Warn about recursion
+        \item Disable certain optimizations
+        \item Verify tail-call optimization applicability
+        \item Calculate stack depth requirements
+    \end{itemize}
+\end{myenumerate}
+\end{frame}
+
+\subsection{Benefits}
+
+\begin{frame}{Why This Matters}
+\begin{myitemize}
+    \item \textbf{Performance}: $O(V + E)$ linear time complexity
+    \item \textbf{Correctness}: Detects all forms of recursion
+    \item \textbf{Optimization}: Enables better code generation
+    \item \textbf{Error Prevention}: Warns about stack overflow
+\end{myitemize}
+
+\pause
+
+\begin{block}{Real-World Impact}
+\begin{itemize}
+    \item Used in GCC, LLVM, and other major compilers
+    \item Essential for functional programming languages
+    \item Critical for optimization passes
+\end{itemize}
+\end{block}
+\end{frame}
+
+%LLVM and Call Graph Analysis
+\section{LLVM and Call Graph Analysis}
+
+\begin{frame}{What is LLVM?}
+\begin{block}{LLVM Overview}
+LLVM (Low Level Virtual Machine) is a modern compiler infrastructure that provides:
+\begin{itemize}
+    \item Intermediate Representation (IR) for code optimization
+    \item Modular compiler architecture
+    \item Language-independent optimization framework
+    \item Used by Clang, Swift, Rust, and many others
+\end{itemize}
+\end{block}
+
+\pause
+
+\begin{myitemize}
+    \item \textbf{Frontend}: Language-specific parsing to LLVM IR
+    \item \textbf{Middle-end}: Optimization passes on IR
+    \item \textbf{Backend}: IR to machine code generation
+\end{myitemize}
+\end{frame}
+
+\begin{frame}{LLVM Optimization Passes}
+\begin{block}{Call Graph-Based Optimizations}
+LLVM uses call graph analysis for multiple optimization passes:
+\end{block}
+
+\begin{myitemize}
+    \item \textbf{Function Inlining}: Inline small, frequently-called functions
+    \item \textbf{Dead Argument Elimination}: Remove unused function parameters
+    \item \textbf{Interprocedural Constant Propagation}: Propagate constants across function boundaries
+    \item \textbf{Tail Call Optimization}: Convert recursive calls to iterations
+\end{myitemize}
+
+\pause
+
+\begin{alertblock}{Bottom-Up Processing}
+SCCs enable bottom-up analysis: analyze callees before callers, maximizing optimization opportunities.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Using LLVM in nicoLang}
+\begin{block}{Integration Approach}
+We leverage LLVM's optimization infrastructure for call graph analysis and optimization passes.
+\end{block}
+
+\bigskip
+
+\begin{myitemize}
+    \item Generate LLVM IR from nicoLang source code
+    \item Use optimization passes for code improvement
+    \item Detect recursive functions through SCC analysis
+    \item Generate optimized machine code
+\end{myitemize}
+
+\pause
+
+\begin{alertblock}{Benefits}
+LLVM provides production-ready infrastructure for sophisticated compiler optimizations and analysis.
+\end{alertblock}
+\end{frame}
+
+%Conclusion
+\section{Conclusion}
+
+\begin{frame}{Summary}
+\begin{myitemize}
+    \item Compilers transform source code through multiple phases
+    \item Call graphs represent function dependencies
+    \item SCCs identify recursive function groups
+    \item Tarjan's algorithm efficiently finds all SCCs
+    \item nicoLang implements this for recursion detection
+\end{myitemize}
+
+\bigskip
+
+\begin{block}{Key Takeaway}
+Graph algorithms like Tarjan's SCC are fundamental to modern compiler construction, enabling sophisticated analysis and optimization.
+\end{block}
 \end{frame}
 
 \begin{frame}{References}
     \begin{thebibliography}{}
-%a book
-\bibitem{BN99}
-Franz Baader, Tobias Nipkow:
-Term Rewriting and All That.
-Cambridge University Press, 1999.
+%Original Paper
+\bibitem{Tarjan72}
+Robert Tarjan: Depth-First Search and Linear Graph Algorithms.
+SIAM Journal on Computing, 1(2):146-160, 1972.
 
-%a book
-\bibitem{Sipser}
-Michael Sipser: Introduction to the Theory of Computation, Cengage, 119-120, 1997. 
-
-%a paper
-\bibitem{Zhang}
-Jielan Zhang, Zhongsheng Qian: The Equivalent Conversion between Regular Grammar and Finite Automata, Journal of Software Engineering and Applications,~6(1), 2013.
-
-%a website
-\bibitem{website1}
-\url{https://en.wikipedia.org/wiki/Computer_science} 
+%LLVM
+\bibitem{LLVM}
+LLVM Project: The LLVM Compiler Infrastructure.
+\url{https://llvm.org/}
 \end{thebibliography}
 \end{frame}
 
