@@ -1,0 +1,229 @@
+\documentclass{beamer} 
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usepackage{lmodern}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[noend]{algorithmic}
+\usepackage{centernot} 
+\usepackage{caption}
+\algsetup{indent=2em} 
+\renewcommand{\algorithmiccomment}[1]{\hspace{2em}// #1} 
+\usepackage{listings}
+\usepackage{epsfig, amssymb, geometry}
+\usepackage{latexsym, graphics, graphicx}
+\usepackage{amsxtra,mathtools}
+\usepackage{textcomp}
+\usepackage{mathptmx,mathrsfs, trajan}
+\usepackage{float}
+\usepackage{wasysym}
+\usetikzlibrary{automata, positioning,arrows.meta,quotes}
+\usepackage{comment}
+\usepackage{lineno}
+\usepackage{semantic}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{ifthen}
+\usepackage{xcolor}
+\usepackage{proof}
+\usepackage{changepage}
+\usepackage{extarrows}
+\usepackage{fancyvrb}
+\usepackage{textpos}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{multicol}
+\usepackage{qtree}
+\usetikzlibrary{circuits.logic.US}
+\usepackage{chronology}
+\usetheme{Madrid}
+\useoutertheme{infolines} 
+\useinnertheme{circles}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.pathmorphing}
+\setbeamertemplate{navigation symbols}{}
+\newenvironment{myitemize}{\begin{itemize}\setlength\itemsep{3ex}}{\end{itemize}}
+\newenvironment{myenumerate}{\begin{enumerate}\setlength\itemsep{3ex}}{\end{enumerate}}
+\newcounter{result}[section]
+\makeatletter
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.7\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertsection
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
+\date{}%leave blank
+\author[]{}%leave blank
+\setbeamersize{text margin left=12mm,text margin right=12mm}
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %Start editing from here
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Compiler Construction \& Tarjan's Algorithm}
+\subtitle{Understanding SCCs in Call Graph Analysis\newline \today}
+
+
+\definecolor{bottomLeft}{RGB}{108, 166, 205}%color for bottom left footer, and Block top labels
+
+\definecolor{headers}{RGB}{0, 191, 255}%color for headers on slides, and table of contents, itemize etc.
+
+\definecolor{writing}{RGB}{255,255,255}%color for writing in headers section
+
+\definecolor{mynavy}{RGB}{36,52,102}%color for text on slides
+
+\setbeamercolor{palette primary}{bg=headers,fg=writing}
+%bg is for headers, fg is for text
+\setbeamercolor{palette secondary}{bg=bottomLeft,fg=writing}
+%bg is for left half of footer, fg is for writing
+\setbeamercolor{structure}{fg=headers} % itemize, enumerate, etc
+\setbeamercolor{section in toc}{fg=headers} % Table of contents sections
+
+%Change text color
+\setbeamercolor {normal text} {fg=mynavy} 
+\usebeamercolor* {normal text}
+
+\setbeamercolor{block title}{bg=bottomLeft,fg=mynavy}
+
+%below is the logo, you can leave it, remove or replace it
+\titlegraphic{\includegraphics[width=5cm,height=1.5cm]{newpaltzlogo.jpg}}
+
+%below are two options for separating sections
+\AtBeginSection[]{
+
+   % \begin{frame}[plain]
+    %    \sectionpage
+    %\end{frame}
+     \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%starts the documents
+\begin{document}
+{
+%this sets an image as a background for the first slide
+\setbeamertemplate{background} 
+{
+    \includegraphics[width=\paperwidth,height=\paperheight]{science-mathematics-abstract-background-circles-cube-triangles-lot-lines-sacred-geometry-backdrop-79621056.jpg}
+}
+\frame{\titlepage}
+}
+
+%first section
+\section{First Section}
+%creates a frame
+\begin{frame}{Frame Title}%Frame Title
+This is a sample frame.
+
+   %creates a list of things
+   \begin{itemize}
+       \item Item 1
+       \item[-] Item 2 %you can choose the bullet point you want
+   \end{itemize}
+
+   \bigskip
+   
+%creates a list with larger gaps
+\begin{myitemize}
+    \item[$\bullet$] Item A
+    \item[+] Item B
+\end{myitemize}
+\end{frame}
+\begin{frame}{Frame Title}
+%this is how you can add a definition
+    \begin{definition}
+        A \underline{\textbf{\emph{new word}}} is ...
+       
+    \end{definition}
+    \pause% this is how you can create a slide that appears step-by-step
+
+    %this is an example block
+    \begin{block}{Block Title}
+        Here is a really cool example. 
+    \end{block}
+\pause
+\begin{block}{Block Title}
+   Here is the answer to that really cool example
+\end{block}
+
+\end{frame}
+
+\subsection{New SubSection}
+
+\begin{frame}{Frame with photo}
+\begin{figure}
+    \centering
+       \includegraphics[scale=0.2]{regLang.jpg}
+
+\end{figure}
+\end{frame}
+
+\section{New Section}
+
+\begin{frame}{Frame with multiple photos}
+\centering
+%only is how we can choose which slides something appears on.
+%this picture will appear on slide 1
+\only<1>{
+    \includegraphics[]{motivation.png}}
+    %this picture will appear on slide 2
+    \only<2>{\includegraphics[scale=0.8]{motivation2.png}}
+%this text will appear on slide 1,2,3
+\only<1,2,3>{HELLO}
+%this text will appear on slide 3
+\only<3>{GOODBYE}
+   
+\end{frame}
+
+\begin{frame}{References}
+    \begin{thebibliography}{}
+%a book
+\bibitem{BN99}
+Franz Baader, Tobias Nipkow:
+Term Rewriting and All That.
+Cambridge University Press, 1999.
+
+%a book
+\bibitem{Sipser}
+Michael Sipser: Introduction to the Theory of Computation, Cengage, 119-120, 1997. 
+
+%a paper
+\bibitem{Zhang}
+Jielan Zhang, Zhongsheng Qian: The Equivalent Conversion between Regular Grammar and Finite Automata, Journal of Software Engineering and Applications,~6(1), 2013.
+
+%a website
+\bibitem{website1}
+\url{https://en.wikipedia.org/wiki/Computer_science} 
+\end{thebibliography}
+\end{frame}
+
+
+
+{
+\setbeamertemplate{background} 
+{
+    \includegraphics[width=\paperwidth,height=\paperheight]{science-mathematics-abstract-background-circles-cube-triangles-lot-lines-sacred-geometry-backdrop-79621056.jpg}
+}
+
+\begin{frame}{}
+    \begin{huge}
+        \begin{center}
+        \textbf{ {Thank You! \\ Questions?}}\\
+           
+        \end{center}
+    \end{huge}
+\end{frame}
+}
+
+
+\end{document}

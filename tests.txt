@@ -1,0 +1,202 @@
+===========================================
+NICOLANG COMPILER TEST SUITE
+===========================================
+
+=== TEST 1: Basic Arithmetic ===
+4+5;
+3*7-2;
+10-2*3;
+(2+3)*4;
+
+Expected outputs:
+- 9.000000
+- 19.000000
+- 4.000000
+- 20.000000
+
+===========================================
+
+=== TEST 2: Function Definition and Calls ===
+def add(x y) x+y;
+add(10, 20);
+def square(x) x*x;
+square(6);
+def average(x y) (x+y)*0.5;
+average(10, 20);
+
+Expected outputs:
+- 30.000000
+- 36.000000
+- 15.000000
+
+===========================================
+
+=== TEST 3: Comparison Operator ===
+3 < 5;
+7 < 2;
+def test(x) x < 10;
+test(5);
+test(15);
+
+Expected outputs:
+- 1.000000 (true)
+- 0.000000 (false)
+- 1.000000
+- 0.000000
+
+===========================================
+
+=== TEST 4: Built-in Print Functions ===
+extern printd(x);
+printd(42.5);
+extern putchard(x);
+putchard(72);
+putchard(65);
+
+Expected outputs:
+- 42.500000
+- H (ASCII 72)
+- A (ASCII 65)
+
+===========================================
+
+=== TEST 5: Nested Function Calls ===
+def double(x) x*2;
+def quadruple(x) double(double(x));
+quadruple(5);
+
+Expected output:
+- 20.000000
+
+===========================================
+
+=== TEST 6: Operator Precedence (PEMDAS) ===
+2+3*4;
+(2+3)*4;
+10-2*3;
+
+Expected outputs:
+- 14.000000 (not 20)
+- 20.000000
+- 4.000000 (not 24)
+
+===========================================
+
+=== TEST 7: Complex Expression Chain ===
+def a(x) x+1;
+def b(x) x*2;
+def c(x) x-3;
+c(b(a(5)));
+
+Expected output:
+- 9.000000  ((5+1)*2)-3 = 9
+
+===========================================
+
+=== TEST 8: Print ASCII Art ===
+extern putchard(x);
+putchard(72) + putchard(101) + putchard(108) + putchard(108) + putchard(111);
+
+Expected output:
+- Hello
+- Evaluated to 0.000000
+
+===========================================
+
+=== TEST 9: Error Handling - Wrong Argument Count ===
+def foo(x y) x+y;
+foo(3);
+
+Expected output:
+- Error Incorrect # arguments passed
+
+===========================================
+
+=== TEST 10: Error Handling - Undefined Function ===
+bar(5);
+
+Expected output:
+- Error Unknown function referenced
+
+===========================================
+
+=== TEST 11: Error Handling - Function Redefinition ===
+def test() 1;
+def test() 2;
+
+Expected output:
+- Error Function cannot be redefined.
+
+===========================================
+
+=== TARJAN'S SCC TESTS (Run until EOF with Ctrl+D) ===
+
+--- SCC Test 1: Direct Recursion ---
+def factorial(n) n < 2 + factorial(n-1) * n;
+
+Expected SCC output on exit:
+SCC: factorial
+
+--- SCC Test 2: Mutual Recursion ---
+extern bar(x);
+def foo(x) bar(x-1);
+def bar(x) foo(x-2);
+
+Expected SCC output on exit:
+SCC: bar <-> foo
+
+--- SCC Test 3: Multiple SCCs ---
+def factorial(n) n < 2 + factorial(n-1);
+extern bar(x);
+extern baz(x);
+def foo(x) bar(x);
+def bar(x) baz(x);
+def baz(x) foo(x);
+
+Expected SCC output on exit:
+SCC: foo <-> baz <-> bar
+SCC: factorial
+
+--- SCC Test 4: No Recursion (No Output) ---
+def add(x y) x+y;
+def square(x) x*x;
+def calc(x) add(square(x), 10);
+
+Expected SCC output on exit:
+(Nothing - no SCCs detected)
+
+--- SCC Test 5: Multiple Independent SCCs ---
+def fib(n) n < 2 + fib(n-1) + fib(n-2);
+extern odd(n);
+def even(n) n < 1 + odd(n-1);
+def odd(n) n < 1 * 0 + even(n-1);
+
+Expected SCC output on exit:
+SCC: odd <-> even
+SCC: fib
+
+===========================================
+
+=== USAGE NOTES ===
+
+1. Compile:
+   clang++ -g -O3 Lexer.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core orcjit native` -o toy
+
+2. Run:
+   ./toy
+
+3. Always end expressions with semicolon (;) for immediate output
+
+4. Use # for comments
+
+5. Press Ctrl+D (EOF) to exit and see SCC analysis
+
+6. Limitations:
+   - Only doubles (no strings, no ints)
+   - No variables/assignments (only function parameters)
+   - No control flow (if/else, while, for)
+   - Only one comparison operator (<)
+   - No logical operators (&&, ||, !)
+   - No arrays/data structures
+
+===========================================
